@@ -19,7 +19,7 @@ namespace IdentityServer4.Models
     public class Client
     {
         // setting grant types should be atomic
-        private ICollection<string> _allowedGrantTypes = new GrantTypeValidatingHashSet();
+        private GrantTypeValidatingHashSet _allowedGrantTypes = new GrantTypeValidatingHashSet();
 
         private string DebuggerDisplay => ClientId ?? $"{{{typeof(Client)}}}";
 
@@ -86,7 +86,7 @@ namespace IdentityServer4.Models
         /// </summary>
         public ICollection<string> AllowedGrantTypes
         {
-            get { return _allowedGrantTypes; }
+            get { return _allowedGrantTypes.ToList(); }
             set
             {
                 ValidateGrantTypes(value);
@@ -361,17 +361,17 @@ namespace IdentityServer4.Models
 
             public GrantTypeValidatingHashSet()
             {
-                _inner = new HashSet<string>();
+                _inner = new List<string>();
             }
 
             public GrantTypeValidatingHashSet(IEnumerable<string> values)
             {
-                _inner = new HashSet<string>(values);
+                _inner = new List<string>(values);
             }
 
             private ICollection<string> Clone()
             {
-                return new HashSet<string>(this);
+                return new List<string>(this);
             }
 
             private ICollection<string> CloneWith(params string[] values)
@@ -410,6 +410,8 @@ namespace IdentityServer4.Models
             {
                 return _inner.GetEnumerator();
             }
+
+            public List<string> ToList() => _inner as List<string>;
 
             public bool Remove(string item)
             {
